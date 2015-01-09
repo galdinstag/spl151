@@ -64,7 +64,11 @@ public class ConnectionHandler<T> {
 
 	public synchronized void addOutData(ByteBuffer buf) {
 		_outData.add(buf);
-		switchToReadWriteMode();
+		try {
+			switchToReadWriteMode();
+		} catch (ClosedChannelException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void closeConnection() {
@@ -85,13 +89,10 @@ public class ConnectionHandler<T> {
 	 * answer
 	 * <LI>Inserts the Task to the ThreadPool
 	 * </UL>
-	 * 
-	 * @throws
-	 * 
 	 * @throws IOException
 	 *             in case of an IOException during reading
 	 */
-	public void read() {
+	public void read() throws IOException {
 		// do not read if protocol has terminated. only write of pending data is
 		// allowed
 		if (_protocol.shouldClose()) {
@@ -136,7 +137,7 @@ public class ConnectionHandler<T> {
 	 * @throws ClosedChannelException
 	 *             if the channel have been closed while registering to the Selector
 	 */
-	public synchronized void write() {
+	public synchronized void write() throws IOException, ClosedChannelException{
 		if (_outData.size() == 0) {
 			// if nothing left in the output string, go back to read mode
 			switchToReadOnlyMode();
@@ -173,7 +174,7 @@ public class ConnectionHandler<T> {
 	 * @throws ClosedChannelException
 	 *             if the channel is closed
 	 */
-	public void switchToReadWriteMode() {
+	public void switchToReadWriteMode() throws ClosedChannelException{
 		_skey.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
 		_data.getSelector().wakeup();
 	}
@@ -184,7 +185,7 @@ public class ConnectionHandler<T> {
 	 * @throws ClosedChannelException
 	 *             if the channel is closed
 	 */
-	public void switchToReadOnlyMode() {
+	public void switchToReadOnlyMode()throws ClosedChannelException{
 		_skey.interestOps(SelectionKey.OP_READ);
 		_data.getSelector().wakeup();
 	}
@@ -195,7 +196,7 @@ public class ConnectionHandler<T> {
 	 * @throws ClosedChannelException
 	 *             if the channel is closed
 	 */
-	public void switchToWriteOnlyMode() {
+	public void switchToWriteOnlyMode() throws ClosedChannelException {
 		_skey.interestOps(SelectionKey.OP_WRITE);
 		_data.getSelector().wakeup();
 	}

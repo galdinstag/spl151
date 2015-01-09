@@ -1,5 +1,6 @@
 package tokenizer_whatsapp;
 
+import tokenizer.MessageTokenizer;
 import tokenizer.Tokenizer;
 import tokenizer.TokenizerFactory;
 
@@ -8,11 +9,8 @@ import tokenizer.TokenizerFactory;
  */
 public class WhatsAppTokenizerFactory implements TokenizerFactory{
 
-    public WhatsAppTokenizerFactory() {
-    }
-
     @Override
-    public Tokenizer create() {
+    public MessageTokenizer create() {
         return null;
     }
 }
