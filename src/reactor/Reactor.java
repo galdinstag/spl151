@@ -15,8 +15,6 @@ import java.util.logging.Logger;
 
 import protocol.*;
 import tokenizer.*;
-import tokenizer.http.HttpMessage;
-import tokenizer.http.HttpMessageTokenizer;
 
 /**
  * An implementation of the Reactor pattern.
