@@ -48,7 +48,7 @@ public class Reactor<T> implements Runnable {
 	 *            the protocol factory to work with
 	 * @param tokenizer
 	 *            the tokenizer factory to work with
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 *             if some I/O problems arise during connection
 	 */
 	public Reactor(int port, int poolSize, ServerProtocolFactory<T> protocol, TokenizerFactory<T> tokenizer) {

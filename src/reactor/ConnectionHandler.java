@@ -88,7 +88,7 @@ public class ConnectionHandler<T> {
 	 * 
 	 * @throws
 	 * 
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 *             in case of an IOException during reading
 	 */
 	public void read() {
@@ -131,9 +131,9 @@ public class ConnectionHandler<T> {
 	 * automatically switch to read only mode, otherwise it'll stay in it's
 	 * current mode (which is read / write).
 	 * 
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 *             if the write operation fails
-	 * @throws java.nio.channels.ClosedChannelException
+	 * @throws ClosedChannelException
 	 *             if the channel have been closed while registering to the Selector
 	 */
 	public synchronized void write() {
@@ -170,7 +170,7 @@ public class ConnectionHandler<T> {
 	/**
 	 * switches the handler to read / write TODO Auto-generated catch blockmode
 	 * 
-	 * @throws java.nio.channels.ClosedChannelException
+	 * @throws ClosedChannelException
 	 *             if the channel is closed
 	 */
 	public void switchToReadWriteMode() {
@@ -181,7 +181,7 @@ public class ConnectionHandler<T> {
 	/**
 	 * switches the handler to read only mode
 	 * 
-	 * @throws java.nio.channels.ClosedChannelException
+	 * @throws ClosedChannelException
 	 *             if the channel is closed
 	 */
 	public void switchToReadOnlyMode() {
@@ -192,7 +192,7 @@ public class ConnectionHandler<T> {
 	/**
 	 * switches the handler to write only mode
 	 * 
-	 * @throws java.nio.channels.ClosedChannelException
+	 * @throws ClosedChannelException
 	 *             if the channel is closed
 	 */
 	public void switchToWriteOnlyMode() {

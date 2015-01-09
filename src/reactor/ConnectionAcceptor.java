@@ -38,7 +38,7 @@ public class ConnectionAcceptor<T> {
 	 * Selector
 	 * </UL>
 	 * 
-	 * @throws java.io.IOException
+	 * @throws IOException
 	 *             in case of an IOException during the acceptance of a new
 	 *             connection
 	 */
