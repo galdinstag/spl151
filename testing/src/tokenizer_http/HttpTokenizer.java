@@ -1,4 +1,6 @@
-package tokenizer;
+package tokenizer_http;
+import tokenizer.Tokenizer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,13 +8,15 @@ import java.io.InputStreamReader;
 /**
  * Created by gal on 1/9/2015.
  */
-public class TokenizerImpl implements Tokenizer {
+public class HttpTokenizer implements Tokenizer {
 
     private InputStreamReader in;
     private char DELIMITER = '$';
+    private boolean _closed;
 
-    public TokenizerImpl(){
+    public HttpTokenizer(){
         in = null;
+        _closed = false;
     }
 
 
@@ -21,25 +25,25 @@ public class TokenizerImpl implements Tokenizer {
         int c;
         StringBuilder sb = new StringBuilder();
         try {
-            in.read();
-            while((c = in.read()) != -1){
-                if((char) c == DELIMITER){
-                    break;
+                in.read();
+                while((c = in.read()) != -1){
+                    if((char) c == DELIMITER){
+                        break;
+                    }
+                    else{
+                        sb.append((char) c);
+                    }
                 }
-                else{
-                    sb.append((char) c);
-
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        catch (IOException e) {
+            _closed = true;
         }
         System.out.println(sb);
         return sb;
     }
         
     public boolean isAlive() {
-        return true;
+        return !_closed;
     }
 
     public void addInputStream(InputStreamReader inputStreamReader) {
