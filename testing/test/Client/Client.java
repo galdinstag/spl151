@@ -21,11 +21,14 @@ public class Client implements Runnable {
             OutputStreamWriter osw = new OutputStreamWriter(clientSocket.getOutputStream(),"UTF-8");
             String line;
             System.out.println("print something");
+            StringBuilder sb = new StringBuilder();
                 while((line = bf.readLine()) != null){
+                    sb.append(line);
                     System.out.println("print something");
                     osw.write(line);
                     osw.flush();
                 }
+            System.out.println(sb.indexOf("\n"));
             clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,14 +1,15 @@
 package tokenizer_http;
 
-import tokenizer.MessageTokenizer;
+import tokenizer.Tokenizer;
 import tokenizer.TokenizerFactory;
 
 /**
  * Created by airbag on 1/8/15.
  */
 public class HttpTokenizerFactory implements TokenizerFactory {
+
     @Override
-    public MessageTokenizer create() {
+    public Tokenizer create() {
         return null;
     }
 }

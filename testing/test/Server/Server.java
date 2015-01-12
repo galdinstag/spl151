@@ -1,6 +1,10 @@
 package Server;
 
+import protocol.ServerProtocol;
+import protocol_http.HttpProtocol;
+import protocol_http.HttpProtocolFactory;
 import tokenizer.Tokenizer;
+import tokenizer_http.HttpMessage;
 import tokenizer_http.HttpTokenizer;
 import tokenizer_http.HttpTokenizerFactory;
 import tokenizer_http.HttpTokenizer;
@@ -18,6 +22,8 @@ public class Server implements Runnable{
     public ServerSocket server;
     public HttpTokenizerFactory _factory;
     public Tokenizer _tokenizer;
+    public HttpProtocolFactory _Pfactory;
+    public ServerProtocol _Pprotocol;
     public Socket client;
     public InputStreamReader in;
 
@@ -30,6 +36,8 @@ public class Server implements Runnable{
 
             _factory = new HttpTokenizerFactory();
             _tokenizer = _factory.create();
+            _Pfactory = new HttpProtocolFactory();
+            _Pprotocol = _Pfactory.create();
             client = server.accept();
             System.out.println("recived connection");
 
@@ -39,7 +47,9 @@ public class Server implements Runnable{
 
             while(_tokenizer.isAlive()){
                 System.out.println("trying to read next token");
-                _tokenizer.nextMessage();
+                HttpMessage message = (HttpMessage)_tokenizer.nextMessage();
+                HttpMessage ans = ((HttpProtocol)_Pprotocol).processMessage(message);
+                System.out.println(ans.toString());
             }
             System.out.println("finished, i'm outahere");
         }

@@ -6,14 +6,10 @@ import tokenizer.TokenizerFactory;
 /**
  * Created by airbag on 1/8/15.
  */
-public class HttpTokenizerFactory implements TokenizerFactory {
+public class HttpTokenizerFactory implements TokenizerFactory<HttpMessage> {
 
-    public HttpTokenizerFactory(){
-
-    }
     @Override
-    public Tokenizer create() {
-        HttpTokenizer httpTokenizer = new HttpTokenizer();
-        return httpTokenizer;
+    public Tokenizer<HttpMessage> create() {
+        return new HttpTokenizer();
     }
 }
