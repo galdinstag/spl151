@@ -70,9 +70,9 @@ public class HttpTokenizer implements Tokenizer<HttpMessage> {
         }
         // deleting the last /n
         rawMessage.delete(0,2);
-
+        System.out.println(rawMessage);
         //set message body
-        message.addMessageBody(new String(rawMessage));
+        message.addMessageBody(new String(rawMessage.substring(0,rawMessage.indexOf("\\n"))));
 
         return message;
     }

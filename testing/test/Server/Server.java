@@ -3,11 +3,14 @@ package Server;
 import protocol.ServerProtocol;
 import protocol_http.HttpProtocol;
 import protocol_http.HttpProtocolFactory;
+import protocol_whatsapp.WhatsAppProtocol;
+import protocol_whatsapp.WhatsAppProtocolFactory;
 import tokenizer.Tokenizer;
-import tokenizer_http.HttpMessage;
+import tokenizer_http.*;
 import tokenizer_http.HttpTokenizer;
-import tokenizer_http.HttpTokenizerFactory;
-import tokenizer_http.HttpTokenizer;
+import tokenizer_whatsapp.WhatsAppMessage;
+import tokenizer_whatsapp.WhatsAppTokenizer;
+import tokenizer_whatsapp.WhatsAppTokenizerFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,10 +23,10 @@ import java.net.Socket;
  */
 public class Server implements Runnable{
     public ServerSocket server;
-    public HttpTokenizerFactory _factory;
-    public Tokenizer _tokenizer;
-    public HttpProtocolFactory _Pfactory;
-    public ServerProtocol _Pprotocol;
+    public WhatsAppTokenizerFactory _Tfactory;
+    public WhatsAppTokenizer _tokenizer;
+    public WhatsAppProtocolFactory _Pfactory;
+    public WhatsAppProtocol _protocol;
     public Socket client;
     public InputStreamReader in;
 
@@ -34,10 +37,10 @@ public class Server implements Runnable{
             server.bind(new InetSocketAddress("127.0.0.1", 126));
             System.out.println("listening...");
 
-            _factory = new HttpTokenizerFactory();
-            _tokenizer = _factory.create();
-            _Pfactory = new HttpProtocolFactory();
-            _Pprotocol = _Pfactory.create();
+            _Tfactory = new WhatsAppTokenizerFactory();
+            _tokenizer = _Tfactory.create();
+            _Pfactory = new WhatsAppProtocolFactory();
+            _protocol = new WhatsAppProtocol();
             client = server.accept();
             System.out.println("recived connection");
 
@@ -48,8 +51,10 @@ public class Server implements Runnable{
             while(_tokenizer.isAlive()){
                 System.out.println("trying to read next token");
                 HttpMessage message = (HttpMessage)_tokenizer.nextMessage();
-                HttpMessage ans = ((HttpProtocol)_Pprotocol).processMessage(message);
-                System.out.println(ans.toString());
+                HttpMessage ans = _protocol.processMessage(message);
+                WhatsAppMessage whatsAppMessage = _tokenizer.nextMessage((HttpRequestMessage)ans);
+                HttpResponseMessage responseMessage = _protocol.processMessage(whatsAppMessage);
+                System.out.println(responseMessage.toString());
             }
             System.out.println("finished, i'm outahere");
         }

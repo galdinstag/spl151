@@ -8,9 +8,7 @@ import protocol.ServerProtocolFactory;
  */
 public class WhatsAppProtocolFactory implements ServerProtocolFactory{
 
-    public WhatsAppProtocolFactory() {
-
-    }
+    public WhatsAppProtocolFactory() {}
     @Override
     public ServerProtocol create() {
         return new WhatsAppProtocol();
