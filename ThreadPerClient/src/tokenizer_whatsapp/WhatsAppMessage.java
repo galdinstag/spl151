@@ -13,15 +13,18 @@ public class WhatsAppMessage{
 
     private String _uriType;
     private HashMap<String,String> _body;
+    private String _cookie;
 
-    public WhatsAppMessage(String uriType){
+    public WhatsAppMessage(String uriType, String cookie){
         _uriType = uriType;
         _body = new HashMap<String, String>();
+        _cookie = cookie;
     }
 
     public void addToBody(String key, String value){
         _body.put(key,value);
     }
+
 
     public String toString() {
         StringBuilder Message = new StringBuilder();
@@ -44,11 +47,7 @@ public class WhatsAppMessage{
         return bodyMapAsList.equals(correctBody);
     }
 
-    public boolean checkCookie() {
-        boolean isValid = false;
-        if(_body.containsKey("Cookie")){
+    public boolean isLogin() { return _uriType.equals("login.jsp"); }
 
-        }
-        return true;
-    }
+    public String getCookie() { return _cookie; }
 }

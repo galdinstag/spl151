@@ -1,13 +1,11 @@
-package threadPerClient;
+package serverComponents;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 
 import protocol.ServerProtocolFactory;
-import protocol_http.HttpProtocolFactory;
 import protocol_whatsapp.WhatsAppProtocolFactory;
 import tokenizer.TokenizerFactory;
-import tokenizer_http.HttpTokenizerFactory;
 import tokenizer_whatsaap.WhatsAppTokenizerFactory;
 
 public class MultipleClientProtocolServer<T> implements Runnable {

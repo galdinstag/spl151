@@ -1,5 +1,6 @@
 package Server;
 
+import application.WhatsAppApplication;
 import protocol.ServerProtocol;
 import protocol_http.HttpProtocol;
 import protocol_http.HttpProtocolFactory;
@@ -29,6 +30,7 @@ public class Server implements Runnable{
     public WhatsAppProtocol _protocol;
     public Socket client;
     public InputStreamReader in;
+    public WhatsAppApplication app;
 
     @Override
     public void run() {
@@ -37,6 +39,7 @@ public class Server implements Runnable{
             server.bind(new InetSocketAddress("127.0.0.1", 126));
             System.out.println("listening...");
 
+            app = new WhatsAppApplication();
             _Tfactory = new WhatsAppTokenizerFactory();
             _tokenizer = _Tfactory.create();
             _Pfactory = new WhatsAppProtocolFactory();

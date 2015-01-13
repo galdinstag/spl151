@@ -48,4 +48,15 @@ public class HttpRequestMessage extends HttpMessage {
 
         return sb.toString();
     }
+
+    public String getCookie() {
+        String cookie;
+        if(_headers.containsKey("Cookie")){
+            cookie = _headers.get("Cookie");
+        }
+        else{
+            cookie = new String("null");
+        }
+        return cookie;
+    }
 }

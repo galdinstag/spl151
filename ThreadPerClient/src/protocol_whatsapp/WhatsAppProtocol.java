@@ -1,5 +1,6 @@
 package protocol_whatsapp;
 
+import application.WhatsAppApplication;
 import protocol.ServerProtocol;
 import protocol_http.HttpProtocol;
 import tokenizer_http.HttpResponseMessage;
@@ -12,6 +13,7 @@ import tokenizer_whatsapp.WhatsAppMessage;
 public class WhatsAppProtocol extends HttpProtocol {
 
     private WhatsAppMessage _msg;
+    private WhatsAppApplication _app;
 
     public WhatsAppProtocol(){
         super();
@@ -25,7 +27,7 @@ public class WhatsAppProtocol extends HttpProtocol {
             response = new HttpResponseMessage(HttpStatusCode.S200);
             response.addMessageBody(new String("ERROR: INCORRECT BODY SENT"));
         }
-        else if(!_msg.checkCookie()){
+        else if(!checkCookie()){
             response = new HttpResponseMessage(HttpStatusCode.S403);
         }
         else{
@@ -33,5 +35,18 @@ public class WhatsAppProtocol extends HttpProtocol {
         }
 
         return response;
+    }
+
+    public void setWhatsAppApplication(WhatsAppApplication app){ _app = app; }
+
+    private boolean checkCookie() {
+        boolean isValid = false;
+        if(_msg.isLogin()){
+            isValid = true;
+        }
+        else if(_app.checkCookie(_msg.getCookie())){
+            isValid = true;
+        }
+            return isValid;
     }
 }

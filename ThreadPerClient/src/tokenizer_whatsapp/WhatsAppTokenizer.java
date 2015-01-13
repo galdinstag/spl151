@@ -24,8 +24,9 @@ public class WhatsAppTokenizer extends HttpTokenizer{
     public WhatsAppMessage nextMessage(HttpRequestMessage msg){
         StringBuilder body = new StringBuilder(msg.getMessageBody());
         String uri = msg.getHttpRequestURI();
+        String cookie = msg.getCookie();
 
-        WhatsAppMessage message = new WhatsAppMessage(uri);
+        WhatsAppMessage message = new WhatsAppMessage(uri,cookie);
 
         String key = new String();
         String value = new String();
