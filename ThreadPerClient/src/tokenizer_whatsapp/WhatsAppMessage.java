@@ -50,4 +50,6 @@ public class WhatsAppMessage{
     public boolean isLogin() { return _uriType.equals("login.jsp"); }
 
     public String getCookie() { return _cookie; }
+
+    public String getUri(){ return _uriType; }
 }

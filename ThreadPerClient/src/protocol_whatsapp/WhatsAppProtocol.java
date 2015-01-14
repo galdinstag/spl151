@@ -31,6 +31,7 @@ public class WhatsAppProtocol extends HttpProtocol {
             response = new HttpResponseMessage(HttpStatusCode.S403);
         }
         else{
+            response = _app.executeURI(_msg);
             response = new HttpResponseMessage(HttpStatusCode.S200);
         }
 
