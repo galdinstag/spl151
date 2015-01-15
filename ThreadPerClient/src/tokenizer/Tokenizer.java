@@ -19,4 +19,6 @@ public interface Tokenizer<T> {
     * adding a bufferedReader from which the tokenizer reads the input.
     */
    void addInputStream(InputStreamReader inputStreamReader);
+
+
 }

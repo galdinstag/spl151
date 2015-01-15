@@ -52,4 +52,6 @@ public class WhatsAppMessage{
     public String getCookie() { return _cookie; }
 
     public String getUri(){ return _uriType; }
+
+    public HashMap<String,String> getBody() { return _body; }
 }

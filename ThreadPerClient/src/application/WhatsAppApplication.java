@@ -7,6 +7,7 @@ import tokenizer_whatsapp.WhatsAppMessage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by gal on 1/13/2015.
@@ -14,11 +15,18 @@ import java.util.Vector;
 public class WhatsAppApplication {
 
     private ArrayList<String> _cookiesContainer;
-    private HashMap<String,>
+    private Vector<User> _usersContainer;
+    private Vector<Group> _groupContainer;
+    private AtomicInteger _cookieCounter;
+    private Object loginDummy;
 
 
     public WhatsAppApplication(){
         _cookiesContainer = new ArrayList<String>();
+        _usersContainer = new Vector<User>();
+        _groupContainer = new Vector<Group>();
+        _cookieCounter = new AtomicInteger(1);
+        loginDummy = new Object();
     }
 
 
@@ -30,6 +38,7 @@ public class WhatsAppApplication {
         HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.S200);
         switch (msg.getUri()){
             case "login.jsp":
+                response.addMessageHeader("Set-Cookie", getACookie());
                 response.addMessageBody(login(msg));
                 break;
             case "logout.jsp":
@@ -86,7 +95,26 @@ public class WhatsAppApplication {
     }
 
     private String login(WhatsAppMessage msg) {
-        return null;
+            StringBuilder responseMassege = new StringBuilder();
+            HashMap<String,String> messageBody = new HashMap<String,String>(msg.getBody());
+            _usersContainer.add(new User(messageBody.get("UserName"),messageBody.get("Phone")));
+        responseMassege.append("Welcome ");
+        responseMassege.append(messageBody.get("UserName"));
+        responseMassege.append("@");
+        responseMassege.append(messageBody.get("Phone"));
+
+        return new String(responseMassege);
+    }
+
+    private String getACookie(){
+        String Cookie;
+        // synchronize so we won't give the same cookie twice (and someone will be left hungry...)
+        synchronized (loginDummy) {
+            Cookie = new String("Cookie" + _cookieCounter.get());
+            _cookiesContainer.add(Cookie);
+            _cookieCounter.incrementAndGet();
+        }
+        return Cookie;
     }
 
 }
