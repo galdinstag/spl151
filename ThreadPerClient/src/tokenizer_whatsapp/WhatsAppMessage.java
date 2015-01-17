@@ -21,8 +21,7 @@ public class WhatsAppMessage{
         _cookie = cookie;
     }
 
-    public void addToBody(String key, String value){
-        _body.put(key,value);
+    public void addBody(HashMap<String,String> body){
     }
 
 

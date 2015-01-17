@@ -50,14 +50,12 @@ public class HttpTokenizer implements Tokenizer<HttpMessage> {
         rawMessage.delete(0,rawMessage.indexOf(" ")+1);
         String RequestedURI = rawMessage.substring(0,rawMessage.indexOf(" "));
         rawMessage.delete(0, rawMessage.indexOf("\\n") + 2);
-        HttpRequestType type;
         if(requestedType.equals("GET")){
-            type = HttpRequestType.GET;
+            message = new HttpGetRequest(RequestedURI);
         }
         else{
-            type = HttpRequestType.POST;
+            message = new HttpPostRequest(RequestedURI);
         }
-        message = new HttpRequestMessage(type,RequestedURI);
         //set message headers
         HashMap<String,String> messageHeaders = new HashMap<String, String>();
         String key;
@@ -69,9 +67,11 @@ public class HttpTokenizer implements Tokenizer<HttpMessage> {
             rawMessage.delete(0,rawMessage.indexOf("\\n") + 2);
         }
         // deleting the last /n
-        rawMessage.delete(0,2);
+        rawMessage.delete(0, 2);
         //set message body
-        message.addMessageBody(new String(rawMessage.substring(0,rawMessage.indexOf("\\n"))));
+        if(message instanceof HttpPostRequest){
+            ((HttpPostRequest) message).addBody(new String(rawMessage.substring(0,rawMessage.indexOf("\\n"))));
+        }
 
         return message;
     }

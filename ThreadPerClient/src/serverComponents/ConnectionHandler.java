@@ -35,27 +35,24 @@ public class ConnectionHandler<T> implements Runnable {
 		System.out.println("The client is from: " + acceptedSocket.getInetAddress() + ":" + acceptedSocket.getPort());
 	}
 
-	public void run()
-	{
+	public void run() {
 
 
 		try {
 			initialize();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			System.out.println("Error in initializing I/O");
 		}
 
 		try {
 			process();
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			System.out.println("Error in I/O");
-		} 
 
-		System.out.println("Connection closed - bye bye...");
-		close();
+			System.out.println("Connection closed - bye bye...");
+			close();
 
+		}
 	}
 
 	public void process() throws IOException
@@ -67,11 +64,12 @@ public class ConnectionHandler<T> implements Runnable {
 			System.out.println("Received \"" + msg + "\" from client");
 			T response = protocol.processMessage(msg);
 			if(response instanceof HttpResponseMessage){
-				System.out.println(response);
+				out.println(response.toString());
 			}
 			else{
 				WhatsAppMessage whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpRequestMessage) response);
-
+				HttpResponseMessage responseMessage = ((WhatsAppProtocol) protocol).processMessage(whatsAppMessage);
+				out.println(responseMessage.toString());
 			}
 
 
