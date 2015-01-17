@@ -17,6 +17,8 @@ public class WhatsAppProtocol extends HttpProtocol {
 
     public WhatsAppProtocol(){
         super();
+        _msg = null;
+
     }
 
     public HttpResponseMessage processMessage(WhatsAppMessage msg){
@@ -31,7 +33,13 @@ public class WhatsAppProtocol extends HttpProtocol {
             response = new HttpResponseMessage(HttpStatusCode.S403);
         }
         else{
-            response = _app.executeURI(_msg);
+            WhatsAppMessage whatsAppResponse =  _app.executeURI(_msg);
+            response = new HttpResponseMessage(HttpStatusCode.S200);
+            // if it's a login, add a cookie to the response
+            if(_msg.getUri().equals("login.jsp")){
+                response.addMessageHeader("Set-Cookie",new String("user_auth=" + _app.getACookie(_msg.getUserName())));
+            }
+            response.addMessageBody(whatsAppResponse.getResponseBody());
         }
 
         return response;
@@ -41,12 +49,17 @@ public class WhatsAppProtocol extends HttpProtocol {
 
     private boolean checkCookie() {
         boolean isValid = false;
+        String cookie = _msg.getCookie();
         if(_msg.isLogin()){
             isValid = true;
         }
-        else if(_app.checkCookie(_msg.getCookie())){
+        else if(_app.checkCookie(cookie.substring(cookie.indexOf("=")+1,cookie.length()))){
             isValid = true;
         }
             return isValid;
+    }
+
+    public void addApp(WhatsAppApplication app) {
+        _app = app;
     }
 }

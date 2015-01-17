@@ -7,10 +7,9 @@ import java.util.Map;
  */
 public class HttpGetRequest extends HttpMessage {
 
-    private final String _httpRequestURI;
 
     public HttpGetRequest(String requestURI) {
-        this._httpRequestURI = requestURI;
+        _httpRequestURI = requestURI;
     }
 
     public String getURI() {

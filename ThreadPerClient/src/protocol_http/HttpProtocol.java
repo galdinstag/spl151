@@ -24,18 +24,18 @@ public class HttpProtocol implements ServerProtocol<HttpMessage> {
     public HttpMessage processMessage(HttpMessage msg) {
         this.msg = msg;
         if (!massageValid()) {
-            msg = new HttpResponseMessage(HttpStatusCode.S404);
+            msg = new HttpResponseMessage(HttpStatusCode.S405);
         }
         return msg;
     }
 
     private boolean massageValid(){
         boolean isValid = true;
-        AvailableURIs uri = AvailableURIs.getURI(((HttpRequestMessage) msg).getHttpRequestURI());
+        AvailableURIs uri = AvailableURIs.getURI(msg.getURI());
         if(uri.getURI().equals("NA")){
             isValid = false;
         }
-        if(((HttpRequestMessage) msg).getHttpRequestType() == HttpRequestType.POST){
+        if(msg instanceof HttpPostRequest){
            if(uri.getType() == HttpRequestType.GET){
                isValid = false;
            }

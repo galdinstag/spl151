@@ -7,10 +7,7 @@ import application.WhatsAppApplication;
 import protocol.ServerProtocol;
 import protocol_whatsapp.WhatsAppProtocol;
 import tokenizer.Tokenizer;
-import tokenizer_http.HttpMessage;
-import tokenizer_http.HttpRequestMessage;
-import tokenizer_http.HttpRequestType;
-import tokenizer_http.HttpResponseMessage;
+import tokenizer_http.*;
 import tokenizer_whatsapp.WhatsAppMessage;
 import tokenizer_whatsapp.WhatsAppTokenizer;
 
@@ -21,7 +18,6 @@ public class ConnectionHandler<T> implements Runnable {
 	Socket clientSocket;
 	ServerProtocol<T> protocol;
 	Tokenizer<T> tokenizer;
-	private WhatsAppApplication _app;
 
 	public ConnectionHandler(Socket acceptedSocket, ServerProtocol<T> p, Tokenizer<T> t, WhatsAppApplication app)
 	{
@@ -30,9 +26,9 @@ public class ConnectionHandler<T> implements Runnable {
 		clientSocket = acceptedSocket;
 		protocol = p;
 		tokenizer = t;
-		_app = app;
 		System.out.println("Accepted connection from client!");
 		System.out.println("The client is from: " + acceptedSocket.getInetAddress() + ":" + acceptedSocket.getPort());
+		((WhatsAppProtocol) protocol).addApp(app);
 	}
 
 	public void run() {
@@ -64,12 +60,20 @@ public class ConnectionHandler<T> implements Runnable {
 			System.out.println("Received \"" + msg + "\" from client");
 			T response = protocol.processMessage(msg);
 			if(response instanceof HttpResponseMessage){
-				out.println(response.toString());
+				System.out.println(response.toString());
 			}
 			else{
-				WhatsAppMessage whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpRequestMessage) response);
+				WhatsAppMessage whatsAppMessage;
+				//check what kind of request we got in response- POST or GET?
+				if(response instanceof HttpPostRequest){
+					whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpPostRequest) response);
+
+				}
+				else{
+					whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpGetRequest) response);
+				}
 				HttpResponseMessage responseMessage = ((WhatsAppProtocol) protocol).processMessage(whatsAppMessage);
-				out.println(responseMessage.toString());
+				System.out.println(responseMessage.toString());
 			}
 
 

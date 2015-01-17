@@ -14,10 +14,13 @@ public abstract class HttpMessage implements Message<HttpMessage> {
     protected static final String HTTP_VERSION = "HTTP/1.1";
     protected final Map<String, String> _headers;
     protected String _body; // object?
+    protected String _httpRequestURI;
+
 
     public HttpMessage() {
         this._headers = new HashMap<String, String>();
         this._body = null;
+        _httpRequestURI = null;
     }
 
     /**
@@ -35,6 +38,10 @@ public abstract class HttpMessage implements Message<HttpMessage> {
      */
     public void addMessageBody(String body) {
         _body = body;
+    }
+
+    public String getURI() {
+        return _httpRequestURI;
     }
 
     public String getMessageBody() {

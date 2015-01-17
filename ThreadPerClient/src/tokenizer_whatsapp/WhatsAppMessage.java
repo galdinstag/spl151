@@ -14,16 +14,31 @@ public class WhatsAppMessage{
     private String _uriType;
     private HashMap<String,String> _body;
     private String _cookie;
+    private String _responseBody;
 
     public WhatsAppMessage(String uriType, String cookie){
         _uriType = uriType;
-        _body = new HashMap<String, String>();
-        _cookie = cookie;
+        _body = new HashMap<>();
+        _cookie = cookie.substring(cookie.indexOf("=")+1,cookie.length());
+        _responseBody = null;
+    }
+
+    public WhatsAppMessage(){
+        _uriType = null;
+        _body = new HashMap<>();
+        _cookie = null;
+        _responseBody = null;
     }
 
     public void addBody(HashMap<String,String> body){
+        _body = body;
     }
 
+    public void addBody(String body){
+        _responseBody = body;
+    }
+
+    public String getResponseBody(){ return _responseBody; }
 
     public String toString() {
         StringBuilder Message = new StringBuilder();
@@ -41,6 +56,7 @@ public class WhatsAppMessage{
         AvailableURIs requestedURI = AvailableURIs.getURI(_uriType);
         LinkedList<String> correctBody = requestedURI.getBodyKeys();
 
+
         Collections.sort(bodyMapAsList);
         Collections.sort(correctBody);
         return bodyMapAsList.equals(correctBody);
@@ -53,4 +69,10 @@ public class WhatsAppMessage{
     public String getUri(){ return _uriType; }
 
     public HashMap<String,String> getBody() { return _body; }
+
+    public String getUserName() { return _body.get("UserName"); }
+
+    public String getAttribute(String attribute) {
+        return _body.get(attribute);
+    }
 }

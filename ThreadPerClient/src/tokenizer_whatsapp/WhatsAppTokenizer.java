@@ -22,11 +22,11 @@ public class WhatsAppTokenizer extends HttpTokenizer{
         WhatsAppMessage message;
         if(msg instanceof HttpPostRequest) {
             message =  new WhatsAppMessage(((HttpPostRequest)msg).getURI(),((HttpPostRequest)msg).getCookie());
+            //get body
+            message.addBody(((HttpPostRequest)msg).getPostBody());
         }
         else{
             message =  new WhatsAppMessage(((HttpGetRequest)msg).getURI(),((HttpGetRequest)msg).getCookie());
-            //get body
-            message.addBody(((HttpPostRequest)msg).getPostBody());
         }
 
         return message;

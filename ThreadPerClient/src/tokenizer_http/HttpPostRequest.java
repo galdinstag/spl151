@@ -1,6 +1,7 @@
 package tokenizer_http;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,6 @@ public class HttpPostRequest extends HttpMessage {
 
     private HashMap<String, String> _postBody;
     private String _rawBody;
-    private final String _httpRequestURI;
 
     public HttpPostRequest(String requestURI) {
         _httpRequestURI = requestURI;
@@ -55,7 +55,7 @@ public class HttpPostRequest extends HttpMessage {
             String value = b.substring(delimiterIndex + 1);
 
             try {
-                value = URLEncoder.encode(value, "UTF-8");
+                value = URLDecoder.decode(value, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
