@@ -27,11 +27,20 @@ public class WhatsAppApplication {
         loginDummy = new Object();
     }
 
-
+    /**
+     *
+     * @param cookie - the cookie the user provided in the request
+     * @return : weather the cookie exists in the Map which means the user's request should be authorized or not.
+     */
     public boolean checkCookie(String cookie) {
         return _cookiesContainer.containsKey(cookie);
     }
 
+    /**
+     *
+     * @param msg - a WhatsApp message containing the URI to execute and the parameters needed by the URI
+     * @return - a WhatsApp message consists of the body of the HttpResponse that should be send to the user
+     */
     public WhatsAppMessage executeURI(WhatsAppMessage msg) {
         WhatsAppMessage response = new WhatsAppMessage();
         String RequestedURI = msg.getUri();
@@ -63,33 +72,43 @@ public class WhatsAppApplication {
         return response;
     }
 
+    /**
+     * Get all the messages sent to the user by a group or a user since the last "queue" request
+     * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill
+     * @return - a String consists of all messages since last "queue" request
+     */
     private String queue(WhatsAppMessage msg) {
-        String userName = _cookiesContainer.get(msg.getCookie());
-        User user = _usersContainer.get(userName);
-
-        return user.queue();
+        User queryingUser = getUserByCookie(msg.getCookie());
+        return queryingUser.queue();
     }
 
+    /**
+     * Removes a given user from a target group, if all parameters are correct
+     * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill
+     * @return - a String consists of the success or failure (and if so then why) of the action
+     */
     private String remove_user(WhatsAppMessage msg) {
         StringBuilder response = new StringBuilder();
+        //get the needed arguments
         String targetGroupName = msg.getAttribute("Target");
         String userPhone = msg.getAttribute("User");
 
 
-        String userName = _cookiesContainer.get(msg.getCookie());
-        User queryingUser = _usersContainer.get(userName);
-
+        User queryingUser = getUserByCookie(msg.getCookie());
         User userToRemove = getUserByPhoneNumber(userPhone);
 
         if(!_groupContainer.containsKey(targetGroupName)){
             response.append("ERROR 770: Target Does not Exist");
         }
+        //check if userToRemove exists in the target group
         else if(!(_groupContainer.get(targetGroupName)).containUser(userToRemove.getName())){
             response.append("ERROR 336: Cannot remove, missing parameters");
         }
+        //check if the querying user is authorized to delete someone
         else if(!(_groupContainer.get(targetGroupName)).containUser(queryingUser.getName())) {
             response.append("ERROR 668: Permission denied");
         }
+        //all is good in the hood
         else {
             _groupContainer.get(targetGroupName).removeUser(userToRemove);
             response.append(userPhone);
@@ -100,29 +119,37 @@ public class WhatsAppApplication {
         return new String(response);
     }
 
+    /**
+     * Add a given user from a target group, if all parameters are correct.
+     * @param msg - a WhatsApp message containing the needed arguments for the function to .
+     * @return - a String consists of the success or failure (and if so then why) of the action.
+     */
     private String add_user(WhatsAppMessage msg){
         StringBuilder response = new StringBuilder();
+        //get the needed attributes
         String targetGroupName = msg.getAttribute("Target");
         String userPhone = msg.getAttribute("User");
 
-        String userName = _cookiesContainer.get(msg.getCookie());
-        User queryingUser = _usersContainer.get(userName);
 
+        User queryingUser = getUserByCookie(msg.getCookie());
         User userToAdd = getUserByPhoneNumber(userPhone);
 
 
         if(!_groupContainer.containsKey(targetGroupName)){
             response.append("ERROR 770: Target Does not Exist");
         }
+        //check if userToAdd exists in the program
         else if(userToAdd == null){
             response.append("ERROR 242: Cannot add user, missing parameters");
         }
         else if((_groupContainer.get(targetGroupName)).containUser(userToAdd.getName())){
             response.append("ERROR 142: Cannot add user, user already in group");
         }
+        //check if the querying user is authorized to add someone
         else if(!(_groupContainer.get(targetGroupName)).containUser(queryingUser.getName())){
             response.append("ERROR 669: Permission denied");
         }
+        //all is good in the hood
         else{
             _groupContainer.get(targetGroupName).addUser(userToAdd);
             response.append(userPhone);
@@ -132,24 +159,20 @@ public class WhatsAppApplication {
         return new String(response);
     }
 
-    private User getUserByPhoneNumber(String userPhone) {
-        User user = null;
-        for(Map.Entry<String,User> entry : _usersContainer.entrySet()){
-            if((entry.getValue().getPhoneNumber().equals(userPhone))){
-                user = entry.getValue();
-            }
-        }
-        return user;
-    }
 
+    /**
+     * Sends a message to a user or a group
+     * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill.
+     * @return - a String consists of the success or failure (and if so then why) of the action.
+     */
     private String send(WhatsAppMessage msg) {
         StringBuilder response = new StringBuilder();
+        //get attributes
         String type = msg.getAttribute("Type");
         String target = msg.getAttribute("Target");
         String content = msg.getAttribute("Content");
 
-        String userName = _cookiesContainer.get(msg.getCookie());
-        User sender = _usersContainer.get(userName);
+        User sender = getUserByCookie(msg.getCookie());
 
         if(! (type.equals("Group") || type.equals("Direct"))){
             response.append("ERROR 836: Invalid Type");
@@ -157,6 +180,7 @@ public class WhatsAppApplication {
         else if(! (_usersContainer.containsKey(target) || _groupContainer.containsKey(target))){
             response.append("ERROR 771: Target Does not Exist");
         }
+        //it's good, it's good, it's gooooooooood...
         else{
             if(type.equals("Direct")){
                 _usersContainer.get(target).addMessage(content,sender.getPhoneNumber());
@@ -168,10 +192,15 @@ public class WhatsAppApplication {
         }
 
 
-        return null;
+        return new String(response);
     }
 
-    private String list(WhatsAppMessage msg) {
+    /**
+     * Returns a list of all users/groups in the program (as requested)
+     * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill.
+     * @return - if succeed- a list as requested, if failed- why?.
+     */
+    private String list(WhatsAppMessage msg) { //TODO: failed attributes
         String listType = msg.getAttribute("List");
         LinkedList<String> participantsList = new LinkedList<>();
         if(listType.equals("Users")){
@@ -187,19 +216,27 @@ public class WhatsAppApplication {
         return participantsList.toString();
     }
 
+    /**
+     * Creates a new group
+     * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill.
+     * @return - a String consists of the success or failure (and if so then why) of the action.
+     */
     private String create_group(WhatsAppMessage msg) {
         StringBuilder response = new StringBuilder();
-
+        //get attributes
         String groupName = msg.getAttribute("GroupName");
         String groupUsers = msg.getAttribute("Users");
-        String unknownUser = usersCheck(new StringBuilder(groupUsers));
+        ArrayList<String> usersList = usersList(new StringBuilder(groupUsers));
+        String unknownUser = usersCheck(usersList);
 
+        //check if GroupName is empty
         if(groupName == ""){
             response.append("ERROR 675: Cannot create group, missing parameters\n");
         }
         else if(_groupContainer.containsKey(groupName)){
             response.append("ERROR 511: Group Name Already Taken");
         }
+        //check if there is an unknown user in the Users given
         else if(unknownUser.length() > 0){
             response.append("ERROR 929: Unknown User ");
             response.append(unknownUser);
@@ -207,7 +244,6 @@ public class WhatsAppApplication {
         //it's all good in the hood
         else{
             _groupContainer.put(groupName,new Group(groupName));
-            ArrayList<String> usersList = usersList(new StringBuilder(groupUsers));
             ArrayList<User> users = new ArrayList<>();
             for(String currUser : usersList){
                 users.add(_usersContainer.get(currUser));
@@ -221,8 +257,83 @@ public class WhatsAppApplication {
         return new String(response);
     }
 
+    /**
+     * Logout the user (removes his cookie from the container)
+     * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill.
+     * @return - "GoodBye.
+     */
+    private String logout(WhatsAppMessage msg) {
+        _cookiesContainer.remove(msg.getCookie());
+        return new String("GoodBye");
+    }
 
+    /**
+     * Login the user (add the user if he doesn't exists)
+     * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill.
+     * @return - if succeed - a welcome message, if failed - why?
+     */
+    private String login(WhatsAppMessage msg) { //TODO: failed login
+        StringBuilder responseMessage = new StringBuilder();
+        //get attributes
+        String userName = msg.getAttribute("UserName");
+        String phone = msg.getAttribute("Phone");
 
+        if(!_usersContainer.containsKey(userName)){
+            _usersContainer.put(userName, new User(userName,phone));
+        }
+        responseMessage.append("Welcome ");
+        responseMessage.append(userName);
+        responseMessage.append("@");
+        responseMessage.append(phone);
+
+        return new String(responseMessage);
+    }
+
+    /**
+     * Returns a new Cookie for the user's authentication
+     * @param userName - the user that logins
+     * @return - a new unique Cookie
+     */
+    public String getACookie(String userName){
+        String Cookie;
+        // synchronize so we won't give the same cookie twice (and someone will be left hungry...)
+        synchronized (loginDummy) {
+            Cookie = new String("Cookie" + _cookieCounter.get());
+            _cookiesContainer.put(Cookie, userName);
+            _cookieCounter.incrementAndGet();
+        }
+        return Cookie;
+    }
+
+    /**
+     * Returns the correct user by his cookie.
+     * @param cookie - user's cookie.
+     * @return - the correct user.
+     */
+    private User getUserByCookie(String cookie){
+        String userName = _cookiesContainer.get(cookie);
+        return _usersContainer.get(userName);
+    }
+
+    /**
+     * Returns the correct user by his phone number.
+     * @param userPhone - dudes phone
+     * @return - the correct user
+     */
+    private User getUserByPhoneNumber(String userPhone) {
+        User user = null;
+        for(Map.Entry<String,User> entry : _usersContainer.entrySet()){
+            if((entry.getValue().getPhoneNumber().equals(userPhone))){
+                user = entry.getValue();
+            }
+        }
+        return user;
+    }
+    /**
+     * Parse users for "create_group.jsp"
+     * @param groupUsers - a string consists of all users intended to be in the group.
+     * @return - a parsed list of the users.
+     */
     private ArrayList<String> usersList(StringBuilder groupUsers) {
         ArrayList<String> users = new ArrayList<>();
         while(groupUsers.length() > 0){
@@ -238,58 +349,21 @@ public class WhatsAppApplication {
         return users;
     }
 
-    private String usersCheck(StringBuilder groupUsers) {
-        System.out.println();
+    /**
+     * Check if all users for "create_group" exists in the program.
+     * @param groupUsers - a list of desired users.
+     * @return - a String of unknown users.
+     */
+    private String usersCheck(ArrayList<String> groupUsers) {
         StringBuilder unknownUser = new StringBuilder();
-        while(groupUsers.length() > 0 && unknownUser.length() == 0){
-            if(groupUsers.indexOf(",") != -1){
-                if(!_usersContainer.containsKey(groupUsers.substring(0,groupUsers.indexOf(",")))){
-                    unknownUser.append(groupUsers.substring(0,groupUsers.indexOf(",")));
-                }
-                groupUsers.delete(0,groupUsers.indexOf(",")+1);
+        for(String currUser : groupUsers){
+            if(unknownUser.length() > 0){
+                break;
             }
-            else{
-                if(!_usersContainer.containsKey(groupUsers.substring(0,groupUsers.length()))){
-                    unknownUser.append(groupUsers.substring(0,groupUsers.length()));
-                }
-                groupUsers.delete(0,groupUsers.length());
+            else if(!_usersContainer.containsKey(currUser)){
+                unknownUser.append(currUser);
             }
         }
         return new String(unknownUser);
-    }
-
-
-
-
-
-
-    private String logout(WhatsAppMessage msg) {
-        _cookiesContainer.remove(msg.getCookie());
-        return new String("GoodBye");
-    }
-
-    private String login(WhatsAppMessage msg) {
-            StringBuilder responseMessage = new StringBuilder();
-            HashMap<String,String> messageBody = new HashMap<String,String>(msg.getBody());
-        if(!_usersContainer.containsKey(messageBody.get("UserName"))){
-            _usersContainer.put(messageBody.get("UserName"), new User(messageBody.get("UserName"),messageBody.get("Phone")));
-        }
-        responseMessage.append("Welcome ");
-        responseMessage.append(messageBody.get("UserName"));
-        responseMessage.append("@");
-        responseMessage.append(messageBody.get("Phone"));
-
-        return new String(responseMessage);
-    }
-
-    public String getACookie(String userName){
-        String Cookie;
-        // synchronize so we won't give the same cookie twice (and someone will be left hungry...)
-        synchronized (loginDummy) {
-            Cookie = new String("Cookie" + _cookieCounter.get());
-            _cookiesContainer.put(Cookie, userName);
-            _cookieCounter.incrementAndGet();
-        }
-        return Cookie;
     }
 }
