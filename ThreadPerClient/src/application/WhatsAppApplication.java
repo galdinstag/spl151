@@ -196,24 +196,33 @@ public class WhatsAppApplication {
     }
 
     /**
-     * Returns a list of all users/groups in the program (as requested)
+     * Returns a list of all users/groups/users in a specific group in the program (as requested)
      * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill.
      * @return - if succeed- a list as requested, if failed- why?.
      */
-    private String list(WhatsAppMessage msg) { //TODO: failed attributes
+    private String list(WhatsAppMessage msg) {
         String listType = msg.getAttribute("List");
-        LinkedList<String> participantsList = new LinkedList<>();
+        StringBuilder response = new StringBuilder();
         if(listType.equals("Users")){
             for(Map.Entry<String,User> entry : _usersContainer.entrySet()){
-                participantsList.add(entry.getKey());
+                response.append(entry.getValue().getPhoneNumber());
             }
         }
-        else if(listType.equals("Group") || listType.equals("Groups")){
+        else if(listType.equals("Groups")){
             for(Map.Entry<String,Group> entry : _groupContainer.entrySet()){
-                participantsList.add(entry.getKey());
+                response.append(entry.getKey());
+                response.append(":");
+                response.append(entry.getValue().getUsersPhone());
+                response.append("\n");
             }
         }
-        return participantsList.toString();
+        else if(!_groupContainer.containsKey(listType)){
+            response.append("ERROR 273: Missing Parameters");
+        }
+        else{
+            response.append(_groupContainer.get(listType).getUsersInformation());
+        }
+        return new String(response);
     }
 
     /**

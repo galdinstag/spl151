@@ -41,4 +41,23 @@ public class Group {
             currUser.addMessage(content,_groupName);
         }
     }
+    public String getUsersPhone(){
+        StringBuilder sb = new StringBuilder();
+        for(User currUser : _usersList){
+            sb.append(currUser.getPhoneNumber());
+        }
+        return new String(sb);
+    }
+
+    public String getUsersInformation() {
+        StringBuilder sb = new StringBuilder();
+        for(User currUser : _usersList){
+            sb.append(currUser.getName());
+            sb.append("@");
+            sb.append(currUser.getPhoneNumber());
+            sb.append("\n");
+        }
+        return new String(sb);
+
+    }
 }
