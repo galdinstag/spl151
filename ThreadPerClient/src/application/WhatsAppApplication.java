@@ -281,20 +281,25 @@ public class WhatsAppApplication {
      * @param msg - a WhatsApp message containing the needed arguments for the function to fulfill.
      * @return - if succeed - a welcome message, if failed - why?
      */
-    private String login(WhatsAppMessage msg) { //TODO: failed login
+    private String login(WhatsAppMessage msg) {
         StringBuilder responseMessage = new StringBuilder();
         //get attributes
         String userName = msg.getAttribute("UserName");
         String phone = msg.getAttribute("Phone");
 
-        if(!_usersContainer.containsKey(userName)){
-            _usersContainer.put(userName, new User(userName,phone));
+        if(userName.equals("") || phone.equals("")){
+            responseMessage.append("ERROR 273: Missing Parameters");
         }
-        responseMessage.append("Welcome ");
-        responseMessage.append(userName);
-        responseMessage.append("@");
-        responseMessage.append(phone);
-
+        //it's good, it's good, it's gooooooood
+        else {
+            if (!_usersContainer.containsKey(userName)) {
+                _usersContainer.put(userName, new User(userName, phone));
+            }
+            responseMessage.append("Welcome ");
+            responseMessage.append(userName);
+            responseMessage.append("@");
+            responseMessage.append(phone);
+        }
         return new String(responseMessage);
     }
 
