@@ -8,14 +8,18 @@ import java.util.Map;
 public class HttpResponseMessage extends HttpMessage {
 
     private final HttpStatusCode _httpStatusCode;
+    private String _body;
 
     public HttpResponseMessage(HttpStatusCode httpStatusCode) {
         _httpStatusCode = httpStatusCode;
+        _body = null;
     }
 
     public HttpStatusCode getHttpStatusCode() {
         return _httpStatusCode;
     }
+
+    public void addMessageBody(String body){ _body = body; }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();

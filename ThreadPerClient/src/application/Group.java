@@ -8,7 +8,7 @@ import java.util.Iterator;
  */
 public class Group {
 
-    private String _groupName;
+    private final String _groupName;
     private ArrayList<User> _usersList;
 
     public Group(String groupName){
@@ -23,39 +23,56 @@ public class Group {
     }
 
     public boolean containUser(String userName) {
-        return _usersList.contains(userName);
+        synchronized (_usersList) {
+            return _usersList.contains(userName);
+        }
     }
 
     public void addUser(User user) {
-        _usersList.add(user);
+        synchronized (_usersList) {
+            _usersList.add(user);
+        }
     }
 
-    public void removeUser(User userToRemove) { //TODO: that shit works?
-        _usersList.remove(userToRemove);
+    public void removeUser(User userToRemove) {
+        synchronized (_usersList) {
+            _usersList.remove(userToRemove);
+        }
     }
 
     public void addMessage(String content) {
-        Iterator<User> it = _usersList.iterator();
-        while(it.hasNext()){
-            User currUser = it.next();
-            currUser.addMessage(content,_groupName);
+        synchronized (_usersList) {
+            Iterator<User> it = _usersList.iterator();
+            while (it.hasNext()) {
+                User currUser = it.next();
+                currUser.addMessage(content, _groupName);
+            }
         }
     }
     public String getUsersPhone(){
         StringBuilder sb = new StringBuilder();
-        for(User currUser : _usersList){
-            sb.append(currUser.getPhoneNumber());
+        synchronized (_usersList) {
+            for (User currUser : _usersList) {
+                sb.append(currUser.getPhoneNumber());
+                sb.append(",");
+            }
+            //trim last ","
+            if(sb.length() > 0){
+                sb.deleteCharAt(sb.length()-1);
+            }
         }
         return new String(sb);
     }
 
     public String getUsersInformation() {
         StringBuilder sb = new StringBuilder();
-        for(User currUser : _usersList){
-            sb.append(currUser.getName());
-            sb.append("@");
-            sb.append(currUser.getPhoneNumber());
-            sb.append("\n");
+        synchronized (_usersList) {
+            for (User currUser : _usersList) {
+                sb.append(currUser.getName());
+                sb.append("@");
+                sb.append(currUser.getPhoneNumber());
+                sb.append("\n");
+            }
         }
         return new String(sb);
 

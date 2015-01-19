@@ -1,7 +1,10 @@
 package serverComponents;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
+import java.net.SocketTimeoutException;
 
 import application.WhatsAppApplication;
 import protocol.ServerProtocolFactory;
@@ -15,7 +18,8 @@ public class MultipleClientProtocolServer<T> implements Runnable {
 	private ServerProtocolFactory<T> _protocolFactory;
 	private TokenizerFactory<T> _tokenizerFactory;
 	private WhatsAppApplication _app;
-
+	private BufferedReader serverAdminConsole;
+	private String consoleLine;
 
 	public MultipleClientProtocolServer(int port, ServerProtocolFactory<T> protocolFactory, TokenizerFactory<T> tokenizerFactory)
 	{
@@ -24,13 +28,16 @@ public class MultipleClientProtocolServer<T> implements Runnable {
 		_protocolFactory = protocolFactory;
 		_tokenizerFactory = tokenizerFactory;
 		_app =  new WhatsAppApplication();
+		serverAdminConsole = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	public void run()
 	{
 		try {
 			serverSocket = new ServerSocket(listenPort);
+			serverSocket.setSoTimeout(1000);
 			System.out.println("Listening...");
+			System.out.println("Admin console is ready...");
 		}
 		catch (IOException e) {
 			System.out.println("Cannot listen on port " + listenPort);
@@ -39,14 +46,29 @@ public class MultipleClientProtocolServer<T> implements Runnable {
 		while (true)
 		{
 			try {
+				if(serverAdminConsole.ready()){
+					if((consoleLine = serverAdminConsole.readLine()).equals("exit")) {
+						close();
+						break;
+					}
+                }
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
 				ConnectionHandler newConnection = new ConnectionHandler(serverSocket.accept(), _protocolFactory.create(),_tokenizerFactory.create(),_app);
 				new Thread(newConnection).start();
 			}
 			catch (IOException e)
 			{
-				System.out.println("Failed to accept on port " + listenPort);
+				if(e instanceof SocketTimeoutException){
+				}
+				else{
+					System.out.println("Failed to accept on port " + listenPort);
+				}
 			}
 		}
+		System.out.println("server done");
 	}
 
 

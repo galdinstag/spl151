@@ -22,11 +22,17 @@ public class HttpProtocol implements ServerProtocol<HttpMessage> {
     }
     @Override
     public HttpMessage processMessage(HttpMessage msg) {
-        this.msg = msg;
-        if (!massageValid()) {
-            msg = new HttpResponseMessage(HttpStatusCode.S405);
+        if(!isEnd(msg)) {
+            this.msg = msg;
+            if (!massageValid()) {
+                msg = new HttpResponseMessage(HttpStatusCode.S405);
+            }
+            return msg;
         }
-        return msg;
+        else{
+
+        }
+        return null;
     }
 
     private boolean massageValid(){
@@ -48,6 +54,6 @@ public class HttpProtocol implements ServerProtocol<HttpMessage> {
 
     @Override
     public boolean isEnd(HttpMessage msg) {
-        return false;
+        return msg.getURI().equals("exit.jsp");
     }
 }

@@ -1,5 +1,8 @@
 package application;
 
+import sun.awt.image.ImageWatched;
+import sun.plugin.javascript.navig.Link;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -8,44 +11,46 @@ import java.util.LinkedList;
  */
 public class User {
 
-    private String _name;
-    private String _phoneNumber;
+    private final String _name;
+    private final String _phoneNumber;
     private LinkedList<InstantMessage> _messages;
     private Iterator _messageQueuePointer;
-    private Iterator _messagePointer;
+    private int _messageQueueIndex;
+
 
     public User(String name, String number) {
         _name = name;
         _phoneNumber = number;
         _messages = new LinkedList<>();
-        _messageQueuePointer = _messages.listIterator();
-        _messageQueuePointer = _messages.listIterator();
-
+        _messageQueueIndex = 0;
+        _messageQueuePointer = null;
     }
 
     public String getName(){ return _name; }
 
     public void addMessage(String message, String sender){
-        _messages.addLast(new InstantMessage(message,sender));
+        synchronized (_messages) {
+            _messages.addLast(new InstantMessage(message, sender));
+        }
     }
 
     public String queue(){
         StringBuilder sb = new StringBuilder();
-        while(_messageQueuePointer.hasNext()){
-            sb.append((_messageQueuePointer.next()).toString());
-            sb.append("\n");
+        synchronized (_messages) {
+            _messageQueuePointer = _messages.listIterator(_messageQueueIndex);
+            while (_messageQueuePointer.hasNext()) {
+                InstantMessage currMessage = (InstantMessage) _messageQueuePointer.next();
+                sb.append(currMessage.toString());
+                sb.append("\n");
+            }
+            _messageQueueIndex = _messages.size();
         }
+        //trim the last "/n" before sending
+        if(sb.length() > 0){
+            sb = new StringBuilder(sb.substring(0,sb.length()-2));
+        }
+
         return new String(sb);
     }
-
-    public String getLatestMessages(){
-        StringBuilder sb = new StringBuilder();
-        while(_messagePointer.hasNext()){
-            sb.append((_messagePointer.next()).toString());
-            sb.append("\n");
-        }
-        return new String(sb);
-    }
-
     public String getPhoneNumber(){ return _phoneNumber; }
 }

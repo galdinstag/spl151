@@ -57,46 +57,32 @@ public class ConnectionHandler<T> implements Runnable {
 
 		while ((msg = tokenizer.nextMessage()) != null)
 		{
-			System.out.println("Received \"" + msg + "\" from client");
-			T response = protocol.processMessage(msg);
-			if(response instanceof HttpResponseMessage){
-				System.out.println(response.toString());
-			}
-			else{
-				WhatsAppMessage whatsAppMessage;
-				//check what kind of request we got in response- POST or GET?
-				if(response instanceof HttpPostRequest){
-					whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpPostRequest) response);
-
-				}
-				else{
-					whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpGetRequest) response);
-				}
-				HttpResponseMessage responseMessage = ((WhatsAppProtocol) protocol).processMessage(whatsAppMessage);
-				System.out.println(responseMessage.toString());
-			}
-
-
-
-
-
-
-			/**
-
-			if (response != null)
-			{
-				out.println(response);
-			}
-
-			if (protocol.isEnd(msg))
-			{
+			//System.out.println("Received \"" + msg + "\" from client");
+			if(protocol.isEnd(msg)){
+				close();
 				break;
 			}
-			*/
+			else {
+				T response = protocol.processMessage(msg);
 
+				if (response instanceof HttpResponseMessage) {
+					System.out.println(response.toString());
+				} else {
+					WhatsAppMessage whatsAppMessage;
+					//check what kind of request we got in response- POST or GET?
+					if (response instanceof HttpPostRequest) {
+						whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpPostRequest) response);
 
-
+					} else {
+						whatsAppMessage = ((WhatsAppTokenizer) tokenizer).nextMessage((HttpGetRequest) response);
+					}
+					HttpResponseMessage responseMessage = ((WhatsAppProtocol) protocol).processMessage(whatsAppMessage);
+					System.out.println(responseMessage.toString());
+				}
+			}
 		}
+		clientSocket.close();
+		System.out.println("Thread done");
 	}
 
 	// Starts listening

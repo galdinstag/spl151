@@ -5,6 +5,7 @@ import tokenizer_http.HttpStatusCode;
 import tokenizer_whatsapp.WhatsAppMessage;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -12,17 +13,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WhatsAppApplication {
 
-    private HashMap<String,String> _cookiesContainer;
-    private HashMap<String,User> _usersContainer;
-    private HashMap<String,Group> _groupContainer;
+    private ConcurrentHashMap<String,String> _cookiesContainer;
+    private ConcurrentHashMap<String,User> _usersContainer;
+    private ConcurrentHashMap<String,Group> _groupContainer;
     private AtomicInteger _cookieCounter;
     private Object loginDummy;
 
 
     public WhatsAppApplication(){
-        _cookiesContainer = new HashMap<>();
-        _usersContainer = new HashMap<>();
-        _groupContainer = new HashMap<>();
+        _cookiesContainer = new ConcurrentHashMap<>();
+        _usersContainer = new ConcurrentHashMap<>();
+        _groupContainer = new ConcurrentHashMap<>();
         _cookieCounter = new AtomicInteger(1);
         loginDummy = new Object();
     }
@@ -169,15 +170,21 @@ public class WhatsAppApplication {
         StringBuilder response = new StringBuilder();
         //get attributes
         String type = msg.getAttribute("Type");
-        String target = msg.getAttribute("Target");
-        String content = msg.getAttribute("Content");
-
-        User sender = getUserByCookie(msg.getCookie());
-
-        if(! (type.equals("Group") || type.equals("Direct"))){
+        String target = null;
+        if(type.equals("Direct")){
+            target =  getUserByPhoneNumber(msg.getAttribute("Target")).getName();
+        }
+        else if(type.equals("Group")){
+            target = msg.getAttribute("Target");
+        }
+        else {
             response.append("ERROR 836: Invalid Type");
         }
-        else if(! (_usersContainer.containsKey(target) || _groupContainer.containsKey(target))){
+
+        String content = msg.getAttribute("Content");
+        User sender = getUserByCookie(msg.getCookie());
+
+        if(! (_usersContainer.containsKey(target) || _groupContainer.containsKey(target))){
             response.append("ERROR 771: Target Does not Exist");
         }
         //it's good, it's good, it's gooooooooood...
@@ -190,8 +197,6 @@ public class WhatsAppApplication {
                 targetGroup.addMessage(content);
             }
         }
-
-
         return new String(response);
     }
 
@@ -204,16 +209,25 @@ public class WhatsAppApplication {
         String listType = msg.getAttribute("List");
         StringBuilder response = new StringBuilder();
         if(listType.equals("Users")){
-            for(Map.Entry<String,User> entry : _usersContainer.entrySet()){
-                response.append(entry.getValue().getPhoneNumber());
+            synchronized (_usersContainer) {
+                for (Map.Entry<String, User> entry : _usersContainer.entrySet()) {
+                    response.append(entry.getValue().getPhoneNumber());
+                    response.append(",");
+                }
+                //trim the last ","
+                if(response.length() > 0){
+                    response.deleteCharAt(response.length()-1);
+                }
             }
         }
         else if(listType.equals("Groups")){
-            for(Map.Entry<String,Group> entry : _groupContainer.entrySet()){
-                response.append(entry.getKey());
-                response.append(":");
-                response.append(entry.getValue().getUsersPhone());
-                response.append("\n");
+            synchronized (_groupContainer) {
+                for (Map.Entry<String, Group> entry : _groupContainer.entrySet()) {
+                    response.append(entry.getKey());
+                    response.append(":");
+                    response.append(entry.getValue().getUsersPhone());
+                    response.append("\n");
+                }
             }
         }
         else if(!_groupContainer.containsKey(listType)){
@@ -336,10 +350,12 @@ public class WhatsAppApplication {
      */
     private User getUserByPhoneNumber(String userPhone) {
         User user = null;
-        for(Map.Entry<String,User> entry : _usersContainer.entrySet()){
-            if((entry.getValue().getPhoneNumber().equals(userPhone))){
+        synchronized (_usersContainer){
+        for(Map.Entry<String,User> entry : _usersContainer.entrySet()) {
+            if ((entry.getValue().getPhoneNumber().equals(userPhone))) {
                 user = entry.getValue();
             }
+        }
         }
         return user;
     }
@@ -351,9 +367,9 @@ public class WhatsAppApplication {
     private ArrayList<String> usersList(StringBuilder groupUsers) {
         ArrayList<String> users = new ArrayList<>();
         while(groupUsers.length() > 0){
-            if(groupUsers.indexOf("=") != -1){
+            if(groupUsers.indexOf(",") != -1){
                 users.add(groupUsers.substring(0,groupUsers.indexOf(",")));
-                groupUsers.delete(0,groupUsers.indexOf("=")+1);
+                groupUsers.delete(0,groupUsers.indexOf(",")+1);
             }
             else{
                 users.add(groupUsers.substring(0, groupUsers.length()));
