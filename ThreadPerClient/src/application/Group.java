@@ -24,7 +24,13 @@ public class Group {
 
     public boolean containUser(String userName) {
         synchronized (_usersList) {
-            return _usersList.contains(userName);
+            boolean isExist = false;
+            for(User currUser : _usersList){
+                if(currUser.getName().equals(userName)){
+                    isExist = true;
+                }
+            }
+            return isExist;
         }
     }
 
