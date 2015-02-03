@@ -1,9 +1,9 @@
-package serverComponents;
+package ThreadPerClient.serverComponents;
 
 import java.io.*;
 import java.net.Socket;
 
-import application.WhatsAppApplication;
+import ThreadPerClient.application.WhatsAppApplication;
 import protocol.ServerProtocol;
 import protocol_whatsapp.WhatsAppProtocol;
 import tokenizer.Tokenizer;
@@ -57,8 +57,10 @@ public class ConnectionHandler<T> implements Runnable {
 
 		while ((msg = tokenizer.nextMessage()) != null)
 		{
-			//System.out.println("Received \"" + msg + "\" from client");
 			if(protocol.isEnd(msg)){
+				//if the user has been naughty and exit before logout.
+				WhatsAppMessage logoutMessage = new WhatsAppMessage("logout.jsp",((HttpGetRequest)msg).getCookie());
+				((WhatsAppProtocol)protocol).processMessage(logoutMessage);
 				close();
 				break;
 			}

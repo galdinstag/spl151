@@ -1,7 +1,4 @@
-package application;
-
-import sun.awt.image.ImageWatched;
-import sun.plugin.javascript.navig.Link;
+package ThreadPerClient.application;
 
 import java.util.Iterator;
 import java.util.LinkedList;

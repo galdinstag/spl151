@@ -1,0 +1,40 @@
+<project name="server" basedir="." default="main">
+
+    <property name="src.dir"    value="src"/>
+    <property name="build.dir"  value="build"/>
+    <property name="bin.dir"    value="bin"/>
+    <property name="classes.dir"    value="${build.dir}/classes"/>
+    <property name="main-class" value="threadPerClient/serverComponents/MultipleClientProtocolServer"/>
+
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+
+    <target name="compile">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${bin.dir}"/>
+        <javac  includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}">
+            <compilerarg line="-proc:none"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${bin.dir}/server.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+
+    <target name="run"  depends="jar">
+        <java jar="${bin.dir}/${ant.project.name}.jar"  fork="true">
+        </java>
+    </target>
+
+    <target name="main" depends="run,clean"/>
+
+</project>

@@ -1,4 +1,4 @@
-package application;
+package ThreadPerClient.application;
 
 /**
  * Created by gal on 1/17/2015.

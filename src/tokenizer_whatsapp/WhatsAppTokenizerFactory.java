@@ -1,16 +1,19 @@
 package tokenizer_whatsapp;
 
-import tokenizer.MessageTokenizer;
+import protocol.ServerProtocolFactory;
 import tokenizer.Tokenizer;
 import tokenizer.TokenizerFactory;
+import tokenizer_http.HttpMessage;
 
 /**
  * Created by airbag on 1/8/15.
  */
-public class WhatsAppTokenizerFactory implements TokenizerFactory{
+public class WhatsAppTokenizerFactory implements TokenizerFactory<HttpMessage>{
 
-    @Override
-    public MessageTokenizer create() {
-        return null;
+    public WhatsAppTokenizerFactory(){}
+
+    public Tokenizer<HttpMessage> create(){
+        return new WhatsAppTokenizer();
     }
+
 }

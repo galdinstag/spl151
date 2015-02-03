@@ -1,4 +1,4 @@
-package serverComponents;
+package ThreadPerClient.serverComponents;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 
-import application.WhatsAppApplication;
+import ThreadPerClient.application.WhatsAppApplication;
 import protocol.ServerProtocolFactory;
 import protocol_whatsapp.WhatsAppProtocolFactory;
 import tokenizer.TokenizerFactory;
@@ -83,7 +83,6 @@ public class MultipleClientProtocolServer<T> implements Runnable {
 		// Get port
 		int port = Integer.decode("126").intValue();
 
-		//MultipleClientProtocolServer server = new MultipleClientProtocolServer(port, new HttpProtocolFactory(), new HttpTokenizerFactory());
 		MultipleClientProtocolServer server = new MultipleClientProtocolServer(port, new WhatsAppProtocolFactory(), new WhatsAppTokenizerFactory());
 		Thread serverThread = new Thread(server);
 		serverThread.start();
@@ -95,6 +94,7 @@ public class MultipleClientProtocolServer<T> implements Runnable {
 			System.out.println("Server stopped");
 		}
 
+		System.out.println("server finished, exiting program");
 
 
 	}

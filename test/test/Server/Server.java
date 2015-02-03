@@ -1,26 +1,5 @@
 package Server;
 
-import application.WhatsAppApplication;
-import protocol.ServerProtocol;
-import protocol.ServerProtocolFactory;
-import protocol_http.HttpProtocol;
-import protocol_http.HttpProtocolFactory;
-import protocol_whatsapp.WhatsAppProtocol;
-import protocol_whatsapp.WhatsAppProtocolFactory;
-import tokenizer.Tokenizer;
-import tokenizer.TokenizerFactory;
-import tokenizer_http.*;
-import tokenizer_http.HttpTokenizer;
-import tokenizer_whatsapp.WhatsAppMessage;
-import tokenizer_whatsapp.WhatsAppTokenizer;
-import tokenizer_whatsapp.WhatsAppTokenizerFactory;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 /**
  * Created by gal on 1/10/2015.
  */

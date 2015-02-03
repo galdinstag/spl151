@@ -1,10 +1,9 @@
-package application;
+package ThreadPerClient.application;
 
-import tokenizer_http.HttpResponseMessage;
-import tokenizer_http.HttpStatusCode;
 import tokenizer_whatsapp.WhatsAppMessage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,8 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WhatsAppApplication {
 
     private ConcurrentHashMap<String,String> _cookiesContainer;
-    private ConcurrentHashMap<String,User> _usersContainer;
-    private ConcurrentHashMap<String,Group> _groupContainer;
+    private ConcurrentHashMap<String, User> _usersContainer;
+    private ConcurrentHashMap<String, Group> _groupContainer;
     private AtomicInteger _cookieCounter;
     private Object loginDummy;
 
@@ -286,7 +285,11 @@ public class WhatsAppApplication {
      * @return - "GoodBye.
      */
     private String logout(WhatsAppMessage msg) {
-        _cookiesContainer.remove(msg.getCookie());
+        if(_cookiesContainer.containsValue(msg.getCookie())) {
+            synchronized (_cookiesContainer) {
+                _cookiesContainer.remove(msg.getCookie());
+            }
+        }
         return new String("GoodBye");
     }
 
