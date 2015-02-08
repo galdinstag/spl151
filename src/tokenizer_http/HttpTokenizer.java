@@ -53,7 +53,9 @@ public class HttpTokenizer implements Tokenizer<HttpMessage> {
         //find type and URI
         String requestedType = rawMessage.substring(START_OF_STRING, rawMessage.indexOf(SPACE));
         rawMessage.delete(START_OF_STRING,rawMessage.indexOf(SPACE)+1);
-        String RequestedURI = rawMessage.substring(START_OF_STRING,rawMessage.indexOf(SPACE));
+        //
+        String RequestedURI = rawMessage.substring(START_OF_STRING+1,rawMessage.indexOf(SPACE));
+        //
         rawMessage.delete(START_OF_STRING, rawMessage.indexOf(LINE_DELIMITER) + LENGTH_OF_LINE_DELIMITER);
         if(requestedType.equals("GET")){
             message = new HttpGetRequest(RequestedURI);

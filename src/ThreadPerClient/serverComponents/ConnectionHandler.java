@@ -59,8 +59,6 @@ public class ConnectionHandler<T> implements Runnable {
 		{
 			if(protocol.isEnd(msg)){
 				//if the user has been naughty and exit before logout.
-				WhatsAppMessage logoutMessage = new WhatsAppMessage("logout.jsp",((HttpGetRequest)msg).getCookie());
-				((WhatsAppProtocol)protocol).processMessage(logoutMessage);
 				close();
 				break;
 			}
@@ -84,7 +82,9 @@ public class ConnectionHandler<T> implements Runnable {
 			}
 		}
 		clientSocket.close();
-		System.out.println("Thread done");
+		//
+		System.out.println("Client at" + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " commited exit, Handler is done.");
+		//
 	}
 
 	// Starts listening

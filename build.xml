@@ -4,7 +4,7 @@
     <property name="build.dir"  value="build"/>
     <property name="bin.dir"    value="bin"/>
     <property name="classes.dir"    value="${build.dir}/classes"/>
-    <property name="main-class" value="threadPerClient/serverComponents/MultipleClientProtocolServer"/>
+    <property name="main-class" value="ThreadPerClient/serverComponents/MultipleClientProtocolServer"/>
 
 
     <target name="clean">

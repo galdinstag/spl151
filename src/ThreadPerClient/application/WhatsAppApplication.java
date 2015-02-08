@@ -285,7 +285,9 @@ public class WhatsAppApplication {
      * @return - "GoodBye.
      */
     private String logout(WhatsAppMessage msg) {
-        if(_cookiesContainer.containsValue(msg.getCookie())) {
+        //
+        if(_cookiesContainer.containsKey(msg.getCookie())) {
+        //
             synchronized (_cookiesContainer) {
                 _cookiesContainer.remove(msg.getCookie());
             }

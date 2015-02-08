@@ -24,7 +24,7 @@ public class WhatsAppProtocol extends HttpProtocol {
         _msg = msg;
         HttpResponseMessage response;
         //checking that the message is whatsApp valid
-        if(!msg.checkBody()){ //TODO: what about exit?
+        if(!msg.checkBody()){
             response = new HttpResponseMessage(HttpStatusCode.S200);
             response.addMessageBody(new String("ERROR: INCORRECT BODY SENT"));
         }
